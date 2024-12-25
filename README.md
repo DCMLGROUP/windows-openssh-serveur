@@ -10,7 +10,7 @@ Ce dépôt contient un script PowerShell pour automatiser l'installation, la con
 
 ## Prérequis
 
-- Windows 10 ou Windows Server 2019/2022.
+- Minimum Windows 10 ou Windows Server 2019.
 - PowerShell avec des privilèges administratifs.
 
 ## Étapes réalisées par le script
