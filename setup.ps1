@@ -6,6 +6,11 @@ Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 Get-Service sshd
 Start-Service sshd
 
+# Configurer le service SSH pour démarrer automatiquement au démarrage de Windows
+Write-Host "Configuration de sshd pour démarrer automatiquement au démarrage de Windows..." -ForegroundColor Green
+Set-Service -Name "sshd" -StartupType Automatic
+Write-Host "Le service sshd a été configuré pour démarrer automatiquement." -ForegroundColor Green
+
 # Configurer le pare-feu pour OpenSSH Server
 $firewallRuleName = "OpenSSH Server (TCP)"
 $sshPort = 22
@@ -26,18 +31,32 @@ if (Test-Path $sshdConfigPath) {
     # Lire le contenu du fichier
     $configContent = Get-Content -Path $sshdConfigPath
 
-    # Décommente et configure PermitRootLogin
+    # Configurer PermitRootLogin
     if ($configContent -match "#?PermitRootLogin") {
         $configContent = $configContent -replace "#?PermitRootLogin.*", "PermitRootLogin yes"
     } else {
         $configContent += "`nPermitRootLogin yes"
     }
 
-    # Décommente et configure PasswordAuthentication
+    # Configurer PasswordAuthentication
     if ($configContent -match "#?PasswordAuthentication") {
         $configContent = $configContent -replace "#?PasswordAuthentication.*", "PasswordAuthentication yes"
     } else {
         $configContent += "`nPasswordAuthentication yes"
+    }
+
+    # Configurer PubkeyAuthentication
+    if ($configContent -match "#?PubkeyAuthentication") {
+        $configContent = $configContent -replace "#?PubkeyAuthentication.*", "PubkeyAuthentication yes"
+    } else {
+        $configContent += "`nPubkeyAuthentication yes"
+    }
+
+    # Configurer AuthorizedKeysFile
+    if ($configContent -match "#?AuthorizedKeysFile") {
+        $configContent = $configContent -replace "#?AuthorizedKeysFile.*", "AuthorizedKeysFile .ssh/authorized_keys"
+    } else {
+        $configContent += "`nAuthorizedKeysFile .ssh/authorized_keys"
     }
 
     # Écrire les modifications dans le fichier
