@@ -1,87 +1,87 @@
-# OpenSSH Server Configuration Script
+# Script de Configuration OpenSSH Server
 
-This repository contains a PowerShell script to automate the installation, configuration, and setup of OpenSSH Server on Windows. The script performs the following tasks:
+Ce dépôt contient un script PowerShell pour automatiser l'installation, la configuration et la mise en place du serveur OpenSSH sur Windows. Le script réalise les tâches suivantes :
 
-1. Verifies if OpenSSH Server is installed.
-2. Installs OpenSSH Server if it's missing.
-3. Starts the OpenSSH Server service.
-4. Configures the Windows Firewall to allow SSH connections.
-5. Updates the SSH configuration file to enable root login and password authentication.
+1. Vérifie si OpenSSH Server est installé.
+2. Installe OpenSSH Server s'il manque.
+3. Démarre le service OpenSSH Server.
+4. Configure le pare-feu Windows pour autoriser les connexions SSH.
+5. Met à jour le fichier de configuration SSH pour activer la connexion root et l'authentification par mot de passe.
 
-## Prerequisites
+## Prérequis
 
-- Windows 10 or Windows Server 2019/2022.
-- PowerShell with administrative privileges.
+- Windows 10 ou Windows Server 2019/2022.
+- PowerShell avec des privilèges administratifs.
 
-## Steps Performed by the Script
+## Étapes réalisées par le script
 
-### 1. Verify and Install OpenSSH Server
-The script checks if OpenSSH Server is installed. If not, it installs the capability using the following commands:
+### 1. Vérifier et installer OpenSSH Server
+Le script vérifie si OpenSSH Server est installé. Sinon, il installe la fonctionnalité à l'aide des commandes suivantes :
 
 ```powershell
 Get-WindowsCapability -Online | ? Name -like 'OpenSSH*'
 Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 ```
 
-### 2. Start the SSH Service
-The script ensures that the SSH service is running:
+### 2. Démarrer le service SSH
+Le script s'assure que le service SSH est en cours d'exécution :
 
 ```powershell
 Get-Service sshd
 Start-Service sshd
 ```
 
-### 3. Configure the Firewall
-The script creates a firewall rule to allow inbound SSH connections on port 22 if the rule does not already exist:
+### 3. Configurer le pare-feu
+Le script crée une règle de pare-feu pour autoriser les connexions SSH entrantes sur le port 22 si la règle n'existe pas déjà :
 
 ```powershell
 New-NetFirewallRule -Name "OpenSSH Server (TCP)" -DisplayName "OpenSSH Server (TCP)" -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
 ```
 
-### 4. Update SSH Configuration
-The script updates the `sshd_config` file to enable root login and password authentication:
+### 4. Mettre à jour la configuration SSH
+Le script met à jour le fichier `sshd_config` pour activer la connexion root et l'authentification par mot de passe :
 
-- Sets `PermitRootLogin` to `yes`.
-- Sets `PasswordAuthentication` to `yes`.
+- Définit `PermitRootLogin` sur `yes`.
+- Définit `PasswordAuthentication` sur `yes`.
 
-If the file does not exist, the script outputs an error message and stops further execution.
+Si le fichier n'existe pas, le script affiche un message d'erreur et arrête l'exécution.
 
-### 5. Restart SSH Service
-The script restarts the SSH service to apply the configuration changes:
+### 5. Redémarrer le service SSH
+Le script redémarre le service SSH pour appliquer les modifications de configuration :
 
 ```powershell
 Restart-Service sshd
 ```
 
-## Usage
+## Utilisation
 
-1. Clone this repository or copy the script to your local machine.
-2. Open PowerShell as Administrator.
-3. Run the script:
+1. Clonez ce dépôt ou copiez le script sur votre machine locale.
+2. Ouvrez PowerShell en tant qu'administrateur.
+3. Exécutez le script :
 
    ```powershell
    .\setup.ps1
    ```
 
-4. Verify that OpenSSH Server is installed and running by connecting via SSH to the machine's IP or hostname.
+4. Vérifiez que le serveur OpenSSH est installé et en cours d'exécution en vous connectant via SSH à l'adresse IP ou au nom d'hôte de la machine.
 
 ## Notes
 
-- The script modifies the following file:
+- Le script modifie le fichier suivant :
   ```
   C:\ProgramData\ssh\sshd_config
   ```
-- Ensure that the `sshd_config` file exists before running the script.
-- Modifying `PermitRootLogin` and `PasswordAuthentication` settings may reduce security. Use with caution in production environments.
+- Assurez-vous que le fichier `sshd_config` existe avant d'exécuter le script.
+- Modifier les paramètres `PermitRootLogin` et `PasswordAuthentication` peut réduire la sécurité. À utiliser avec précaution dans des environnements de production.
 
-## Troubleshooting
+## Résolution des problèmes
 
-If you encounter issues:
+Si vous rencontrez des problèmes :
 
-- Ensure PowerShell is run as Administrator.
-- Check the Windows Event Logs for SSH-related errors.
-- Verify that port 22 is open and not blocked by other firewall rules.
+- Assurez-vous d'exécuter PowerShell en tant qu'administrateur.
+- Vérifiez les journaux des événements Windows pour les erreurs liées à SSH.
+- Vérifiez que le port 22 est ouvert et non bloqué par d'autres règles de pare-feu.
 
-## License
+## Licence
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
